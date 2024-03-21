@@ -1,5 +1,6 @@
 package com.example.securityjwt.config;
 
+import com.example.securityjwt.jwt.JwtUtil;
 import com.example.securityjwt.jwt.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,7 +44,7 @@ public class SecurityConfig {
 
         http
                 // 필터 등록 - UsernamePasswordAuthenticationFilter을 LoginFilter로 대체
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http
                 // Session STATELESS 설정
