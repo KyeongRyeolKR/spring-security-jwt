@@ -34,6 +34,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // CORS 설정 - 웹 브라우저에서 출처가 다른 곳에서 자원을 공유하는걸 허락하기 위한 설정
+                // Spring MVC 외부 CORS 설정 -> ex) LoginFilter
                 .cors(
                         (cors) -> cors
                                 .configurationSource(new CorsConfigurationSource() {
