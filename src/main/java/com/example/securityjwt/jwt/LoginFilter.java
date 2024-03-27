@@ -3,10 +3,12 @@ package com.example.securityjwt.jwt;
 import com.example.securityjwt.dto.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,14 +38,28 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        log.info("login success");
-        CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
+        // 사용자 정보
+        String username = authResult.getName();
+        String role = authResult.getAuthorities().iterator().next().getAuthority();
 
-        String username = customUserDetails.getUsername();
-        String role = customUserDetails.getAuthorities().iterator().next().getAuthority();
-        String token = jwtUtil.createJwt(username, role, 60*60*10L);
+        // 토큰 생성
+        String access = jwtUtil.createJwt("access", username, role, 600000L);
+        String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
 
-        response.addHeader("Authorization", "Bearer " + token);
+        // 응답 설정
+        response.setHeader("access", access);
+        response.addCookie(createCookie("refresh", refresh));
+        response.setStatus(HttpStatus.OK.value());
+    }
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24*60*60);
+        cookie.setHttpOnly(true);
+//        cookie.setPath("/");
+//        cookie.setSecure(true);
+
+        return cookie;
     }
 
     @Override
