@@ -1,5 +1,6 @@
 package com.example.securityjwt.config;
 
+import com.example.securityjwt.jwt.CustomLogoutFilter;
 import com.example.securityjwt.jwt.JwtFilter;
 import com.example.securityjwt.jwt.JwtUtil;
 import com.example.securityjwt.jwt.LoginFilter;
@@ -17,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -79,6 +81,10 @@ public class SecurityConfig {
         http
                 // 필터 등록 - UsernamePasswordAuthenticationFilter을 LoginFilter로 대체
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class);
+
+        http
+                // 필터 등록 - LogoutFilter 이전에 실행
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 
         http
                 // Session STATELESS 설정
