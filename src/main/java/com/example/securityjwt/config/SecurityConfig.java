@@ -3,6 +3,7 @@ package com.example.securityjwt.config;
 import com.example.securityjwt.jwt.JwtFilter;
 import com.example.securityjwt.jwt.JwtUtil;
 import com.example.securityjwt.jwt.LoginFilter;
+import com.example.securityjwt.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -76,7 +78,7 @@ public class SecurityConfig {
 
         http
                 // 필터 등록 - UsernamePasswordAuthenticationFilter을 LoginFilter로 대체
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class);
 
         http
                 // Session STATELESS 설정
