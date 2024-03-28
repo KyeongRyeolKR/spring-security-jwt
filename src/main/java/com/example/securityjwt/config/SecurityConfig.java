@@ -66,6 +66,7 @@ public class SecurityConfig {
                         (auth) -> auth
                                 .requestMatchers("/login", "/", "/join").permitAll()
                                 .requestMatchers("/admin").hasRole("ADMIN")
+                                .requestMatchers("/reissue").permitAll()
                                 .anyRequest().authenticated()
                 );
 
